@@ -1,5 +1,8 @@
+
 import express from "express";
 import bodyParser from "body-parser";
+import swaggerUi from "swagger-ui-express";
+import openapiSpecification from "./openapi.json" with { type: "json" };
 const  app = express();
 const PORT = 3000;
 const tasks=[
@@ -77,34 +80,26 @@ if (title !== undefined) {
 
     task.title = title.trim();
   }
-
    if (done !== undefined) {
-
      if (typeof done !== "boolean") {
       return res.status(400).json({
         error: "Done must be true or false"
       });
     }
-
     task.done = done;
   }
-
    res.json(task);
 });
 app.delete("/tasks/:id", (req, res) => {
   const id = Number(req.params.id);
-
  const taskIndex = tasks.findIndex(task => task.id === id);
-
   if (taskIndex === -1) {
     return res.status(404).json({
       error: `Task ${id} not found`
     });
   }
-
   tasks.splice(taskIndex, 1);
-
   res.status(204).send();
 });
-
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(openapiSpecification));
  app.listen(PORT, () => console.log(`Server running on port: http://localhost:${PORT}`));
